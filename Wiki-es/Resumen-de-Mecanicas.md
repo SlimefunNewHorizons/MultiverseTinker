@@ -220,8 +220,8 @@ la brocha y los moldes no pertenecen a ningún material, cualquier filtro activo
 |---|---|---|
 | `/mvtink` | todos | Ayuda pública (solo `codex`). Con `multiversetinker.admin` o cualquiera de sus nodos por subcomando: la ayuda de los subcomandos que ese jugador puede ejecutar |
 | `/mvtink codex [jugador]` | usuarios del codex; apuntar a otro jugador necesita admin | Abre el Codex de Aleaciones |
-| `/mvtink craft <weapon\|tool\|armor> <tipo> <m1> <m2> [m3] [tier]` | admin | Forja equipo al instante |
-| `/mvtink give <jugador> <id> [cantidad]` | admin | Entrega cualquier ítem registrado, y forja y registra la aleación cuando el id nombra un par del crisol que nadie ha fundido todavía |
+| `/mvtink craft <weapon\|tool\|armor> <tipo> <m1> <m2> [m3] [tier]` | admin | Forja equipo al instante; cada pieza lleva un material o hasta tres unidos con `+` |
+| `/mvtink give <jugador> <id> [cantidad]` | admin | Entrega cualquier ítem registrado, y forja y registra la aleación cuando el id nombra un par del crisol que nadie ha fundido todavía (una primordial sobre una compuesta sin fundir forja ambas) |
 | `/mvtink forge <build\|check\|gui> [rotación]` | admin | Construye / valida / abre la Forja |
 | `/mvtink verify` | admin | Diagnostica el registro de ítems |
 | `/mvtink reload` | admin | Recarga config, ítems y loot |
@@ -241,7 +241,11 @@ un servidor decide sin instalar un plugin de permisos. Ver **[Configuración](Co
 El autocompletado ofrece **todos los ids de ítem registrados** en una sola lista y la filtra según
 escribes, y el prefijo `mvtink_` es opcional en todos sitios: escribiendo `tin` aparecen `mvtink_tin`,
 `mvtink_tin_ingot` y el resto. En `/mvtink craft` las casillas de material aceptan también esos ids
-de ítem, así que un id copiado del codex se puede pegar directamente.
+de ítem, así que un id copiado del codex se puede pegar directamente. Una casilla puede además **mezclar
+hasta tres materiales** unidos con `+` (`gold+ruby+cobalt` → 33/33/34, `gold+ruby` → 50/50), las mismas
+mezclas que funde la mesa de piezas de la Forja, y el autocompletado conserva lo escrito antes del `+`.
+Un **id de par** del crisol (`alloy_tin_zinc`, `prime_alloy_tin_zinc_bronze`) se forja y registra al
+momento, así que cada aleación y cada pieza mezclada que hace la Forja es alcanzable sin ella.
 
 ---
 

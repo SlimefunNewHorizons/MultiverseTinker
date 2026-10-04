@@ -199,3 +199,22 @@ Every animation is **tinted with the dominant mineral colour** of the item, so t
 ---
 
 > ⚙️ **Tooltip width**: long perk and trait rows are word-wrapped so nothing is clipped off the screen. The row width, the wider header budget and the on/off switch all live in `config.yml` — see the **[Configuration Reference](Configuration.md)**.
+
+---
+
+## ⚡ Direct Creation Command (Admin)
+
+For administrators or quick tests without building the physical Forge structure:
+```bash
+/mvtink craft <weapon|tool|armor> <type> <m1> <m2> [m3] [tier]
+```
+- **Categories**:
+  - `weapon`: `SWORD`, `BOW`, `TRIDENT`, `SPEAR`, `MACE`, `CROSSBOW`, `SHIELD`.
+  - `tool`: `PICKAXE`, `AXE`, `HOE`, `SHOVEL`, `FISHING_ROD`.
+  - `armor`: `HELMET`, `CHESTPLATE`, `LEGGINGS`, `BOOTS`.
+- **Materials**: any mineral or alloy of the plugin (`gold`, `diamond`, `ruby`, `borax`, `titanium`, `manyullyn`…), or any of its item ids (`mvtink_cobalt_ingot`).
+- **Mixed parts**: join up to **three materials** with `+` in one slot (`gold+ruby+cobalt` → 33/33/34, `gold+ruby` → 50/50), just like the three material slots of the part table.
+- **Pair ids**: a crucible pair id (`alloy_tin_zinc`, `prime_alloy_tin_zinc_bronze`) is forged and registered on the spot, with no need to smelt it first.
+- **Optional tier**: `WOOD`, `STONE`, `COPPER`, `IRON`, `GOLD`, `DIAMOND`, `NETHERITE` (defaults to `WOOD`).
+- *Example*: `/mvtink craft weapon SWORD gold ruby sapphire NETHERITE` creates a Netherite-tier Broadsword with a gold blade, a ruby handle and a sapphire pommel.
+- *Mixed example*: `/mvtink craft weapon SWORD gold+ruby+cobalt silver diamond NETHERITE` casts the blade from a third of each mineral.

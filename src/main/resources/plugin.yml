@@ -31,7 +31,7 @@ permissions:
     description: "Umbrella node: every administrative MultiverseTinker subcommand (/mvtink craft, give, forge, verify and reload) and aiming the codex at another player. Granted to operators by default; a permissions plugin is the only way to give it to a player."
     default: op
   multiversetinker.admin.craft:
-    description: Allows /mvtink craft, assembling weapons, tools and armor straight into a hand without the Forge.
+    description: Allows /mvtink craft, assembling weapons, tools and armor straight into a hand without the Forge; a part blends up to three materials joined with +.
     default: op
   multiversetinker.admin.give:
     description: Allows /mvtink give, handing any registered item to a player; a crucible pair id from the codex is forged and registered on the spot.

@@ -371,6 +371,108 @@ class MultiverseTinkerCommandTest {
         assertNull(findHeld(smith, "mvtink_alloy_tin_tin_raw"));
     }
 
+    @Test
+    @DisplayName("give forges a prime over an unsmelted composite in one command, composite first")
+    void giveForgesAPrimeOverAPendingComposite() {
+        PlayerMock smith = server.addPlayer("smith");
+        String primeId = "mvtink_prime_alloy_tin_zinc_bronze";
+        assertNull(plugin.getMaterialRegistry().get("mvtink_alloy_tin_zinc"));
+
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink give smith " + primeId + "_ingot"));
+        List<String> messages = drainMessages();
+
+        assertNotNull(plugin.getMaterialRegistry().get("mvtink_alloy_tin_zinc"),
+                "The composite parent must be forged on the way, got: " + messages);
+        assertNotNull(plugin.getMaterialRegistry().get(primeId), "The prime itself must be registered");
+        assertEquals(2, plugin.getAlloyRegistry().getDynamicAlloyCount(), "Both alloys are player-forged");
+        assertTrue(messages.stream().anyMatch(line -> line.contains("mvtink_alloy_tin_zinc") && line.contains("first")),
+                "The admin must hear that the composite was forged too, got: " + messages);
+        assertEquals(1, countHeld(smith, primeId + "_ingot"));
+    }
+
+    @Test
+    @DisplayName("give refuses a prime over a pending composite that the crucible would never make")
+    void giveRefusesInvalidPrimesOverPendingComposites() {
+        server.addPlayer("smith");
+
+        for (String id : List.of(
+                "mvtink_prime_bronze_alloy_tin_zinc",          // not the canonical order
+                "mvtink_prime_alloy_copper_tin_bronze",        // copper + tin is Bronze, not a composite
+                "mvtink_prime_alloy_zinc_tin_bronze",          // the composite itself is misspelled
+                "mvtink_prime_alloy_tin_zinc_cobalt",          // no legendary parent
+                "mvtink_prime_alloy_tin_unobtainium_bronze")) { // an unknown mineral
+            drainMessages();
+            assertTrue(admin.performCommand("mvtink give smith " + id));
+            assertTrue(drainMessages().stream().anyMatch(line -> line.contains("Item not found")),
+                    id + " must stay unknown");
+        }
+
+        assertEquals(0, plugin.getAlloyRegistry().getDynamicAlloyCount(),
+                "A refused prime must not leave its composite behind");
+    }
+
+    @Test
+    @DisplayName("give forges a pair id typed without the optional mvtink_ prefix")
+    void giveAcceptsAPairIdWithoutPrefix() {
+        PlayerMock smith = server.addPlayer("smith");
+
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink give smith alloy_tin_zinc_ingot"));
+
+        assertNotNull(plugin.getMaterialRegistry().get("mvtink_alloy_tin_zinc"));
+        assertEquals(1, countHeld(smith, "mvtink_alloy_tin_zinc_ingot"));
+    }
+
+    @Test
+    @DisplayName("craft blends up to three materials per part, like the forge's part table")
+    void craftBlendsMaterialsInsideAPart() {
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink craft weapon SWORD tin+copper+cobalt zinc_ingot+tin tin NETHERITE"));
+        List<String> forged = drainMessages();
+        assertTrue(forged.stream().anyMatch(line -> line.contains("Admin Crafted")), "got: " + forged);
+        assertNotNull(admin.getInventory().getItem(0), "The sword must land in the inventory");
+
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink craft armor HELMET tin+copper+cobalt+zinc tin tin"));
+        assertTrue(drainMessages().stream().anyMatch(line -> line.contains("at most 3")),
+                "A fourth material must be refused");
+
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink craft tool PICKAXE tin+mvtink_smeltery tin tin"));
+        assertTrue(drainMessages().stream().anyMatch(line -> line.contains("Unrecognized material: mvtink_smeltery")),
+                "The failing token must be named");
+    }
+
+    @Test
+    @DisplayName("craft forges a crucible pair id on demand, so no give is needed first")
+    void craftForgesAPairIdOnDemand() {
+        drainMessages();
+        assertTrue(admin.performCommand("mvtink craft weapon BOW mvtink_prime_alloy_tin_zinc_bronze+tin alloy_tin_zinc"));
+        List<String> forged = drainMessages();
+
+        assertTrue(forged.stream().anyMatch(line -> line.contains("Admin Crafted")), "got: " + forged);
+        assertNotNull(plugin.getMaterialRegistry().get("mvtink_alloy_tin_zinc"));
+        assertNotNull(plugin.getMaterialRegistry().get("mvtink_prime_alloy_tin_zinc_bronze"));
+    }
+
+    @Test
+    @DisplayName("craft completes only the material being typed after a +")
+    void craftCompletesBlendedParts() {
+        TabCompleter completer = command.getTabCompleter();
+
+        List<String> blended = completer.onTabComplete(admin, command, "mvtink",
+                new String[]{"craft", "weapon", "SWORD", "tin+cob"});
+        assertNotNull(blended);
+        assertTrue(blended.contains("tin+mvtink_cobalt"), "got " + blended);
+        assertTrue(blended.stream().allMatch(id -> id.startsWith("tin+mvtink_cobalt")), "got " + blended);
+
+        List<String> full = completer.onTabComplete(admin, command, "mvtink",
+                new String[]{"craft", "weapon", "SWORD", "tin+tin+tin+"});
+        assertNotNull(full);
+        assertTrue(full.isEmpty(), "A part already holding three materials takes no fourth, got " + full);
+    }
+
     /** How much of one registry id the player is carrying. */
     private int countHeld(PlayerMock player, String itemId) {
         int held = 0;

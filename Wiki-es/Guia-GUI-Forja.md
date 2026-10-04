@@ -212,6 +212,9 @@ Para administradores o pruebas rápidas sin necesidad de armar la estructura fí
   - `weapon`: `SWORD`, `BOW`, `TRIDENT`, `SPEAR`, `MACE`, `CROSSBOW`, `SHIELD`.
   - `tool`: `PICKAXE`, `AXE`, `HOE`, `SHOVEL`, `FISHING_ROD`.
   - `armor`: `HELMET`, `CHESTPLATE`, `LEGGINGS`, `BOOTS`.
-- **Materiales**: Cualquier mineral o aleación del plugin (por ejemplo: `gold`, `diamond`, `ruby`, `borax`, `titanium`, `manyullyn`, etc.).
+- **Materiales**: Cualquier mineral o aleación del plugin (por ejemplo: `gold`, `diamond`, `ruby`, `borax`, `titanium`, `manyullyn`, etc.), o cualquiera de sus ids de ítem (`mvtink_cobalt_ingot`).
+- **Piezas mezcladas**: une hasta **tres materiales** con `+` en una misma casilla (`gold+ruby+cobalt` → 33/33/34, `gold+ruby` → 50/50), igual que las tres casillas de material de la mesa de piezas.
+- **Ids de par**: un id de par del crisol (`alloy_tin_zinc`, `prime_alloy_tin_zinc_bronze`) se forja y registra al momento, sin necesidad de fundirlo antes.
 - **Tier Opcional**: `WOOD`, `STONE`, `COPPER`, `IRON`, `GOLD`, `DIAMOND`, `NETHERITE` (por defecto `WOOD`).
 - *Ejemplo*: `/mvtink craft weapon SWORD gold ruby sapphire NETHERITE` genera una Espada Ancha de Netherite con 30% daño de oro, filo ígneo de rubí y congelación de zafiro.
+- *Ejemplo mezclado*: `/mvtink craft weapon SWORD gold+ruby+cobalt silver diamond NETHERITE` forja la hoja con un tercio de cada mineral.

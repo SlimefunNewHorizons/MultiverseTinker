@@ -3,6 +3,7 @@ package com.chagui68.multiversetinker.commands;
 import com.chagui68.multiversetinker.MultiverseTinker;
 import com.chagui68.multiversetinker.access.AccessControl;
 import com.chagui68.multiversetinker.access.AccessControl.AdminCommand;
+import com.chagui68.multiversetinker.alloys.AlloyRegistry;
 import com.chagui68.multiversetinker.alloys.TinkerAlloy;
 import com.chagui68.multiversetinker.access.AccessControl.Surface;
 import com.chagui68.multiversetinker.archaeology.ArchaeologyLootTable;
@@ -53,6 +54,9 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
 
     /** Prefix every registered id carries, optional in every command argument. */
     private static final String ID_PREFIX = "mvtink_";
+
+    /** Materials one part may blend, matching the three material slots of the forge's part table. */
+    private static final int MAX_PART_MATERIALS = 3;
 
     private final MultiverseTinker plugin;
     private final MaterialRegistry materialRegistry;
@@ -187,11 +191,20 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
                 String handedOut = itemId;
                 TinkerAlloy blended = null;
                 boolean freshlyForged = false;
+                String forgedComposite = null;
                 if (item == null) {
-                    TinkerItemRegistry.IdRequest request = TinkerItemRegistry.parseId(itemId);
+                    // The prefix is optional here too: "alloy_tin_zinc" names the same pair.
+                    TinkerItemRegistry.IdRequest request = TinkerItemRegistry.parseId(
+                            itemId.startsWith(ID_PREFIX) ? itemId : ID_PREFIX + itemId);
+                    int knownBefore = plugin.getAlloyRegistry().getDynamicAlloyCount();
                     blended = plugin.getAlloyRegistry().alloyForPairId(request.materialId(), materialRegistry);
                     if (blended != null) {
                         freshlyForged = blended.id().equalsIgnoreCase(request.materialId());
+                        // A prime over an unblended composite forges that composite first.
+                        if (plugin.getAlloyRegistry().getDynamicAlloyCount() - knownBefore > 1) {
+                            forgedComposite = blended.mat1Id().startsWith(AlloyRegistry.COMPOSITE_PREFIX)
+                                    ? blended.mat1Id() : blended.mat2Id();
+                        }
                         handedOut = request.idFor(blended.id());
                         item = itemRegistry.getItemById(handedOut);
                     }
@@ -230,6 +243,10 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
                                     + blended.name() + "</yellow> <dark_gray>(" + blended.id() + ")</dark_gray><gray>.</gray>"
                             : "<gray>That id names a crucible pair, and the crucible would produce </gray><yellow>"
                                     + blended.name() + "</yellow> <dark_gray>(" + blended.id() + ")</dark_gray><gray>.</gray>"));
+                    if (forgedComposite != null) {
+                        sender.sendMessage(miniMessage.deserialize("<gray>Its composite parent had never been smelted either, so </gray><yellow>"
+                                + forgedComposite + "</yellow><gray> was forged and registered first.</gray>"));
+                    }
                 }
 
                 sender.sendMessage(miniMessage.deserialize("<green>Gave " + amount + "x " + handedOut + " to " + target.getName() + ".</green>"));
@@ -298,6 +315,7 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
                 if (args.length < 5) {
                     player.sendMessage(miniMessage.deserialize("<red>Usage: /" + label + " craft <weapon|tool|armor> <type> <mat1> <mat2> [mat3] [tier]</red>"));
                     player.sendMessage(miniMessage.deserialize("<gray>Example: /" + label + " craft weapon SWORD gold ruby diamond NETHERITE</gray>"));
+                    player.sendMessage(miniMessage.deserialize("<gray>Blend up to 3 materials in one part with +: /" + label + " craft weapon SWORD gold+ruby+cobalt silver diamond</gray>"));
                     return true;
                 }
 
@@ -377,6 +395,50 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
         return materialRegistry.get("mvtink_" + id);
     }
 
+    /**
+     * Reads one part slot of {@code /mvtink craft}: a single material, or up to three joined with
+     * {@code +} — the same three slots the forge's part table takes (33/33/34 for three materials,
+     * 50/50 for two, 100 for one).
+     *
+     * <p>Every token is resolved like the rest of the command, and a crucible pair id from the codex is
+     * forged on the spot exactly as {@code give} does, so a part can be cast straight from an alloy
+     * nobody has smelted yet. The player is told which token failed.</p>
+     */
+    @Nullable
+    private PartComposition parsePart(@Nonnull Player player, @Nonnull String arg) {
+        String[] tokens = arg.split("\\+", -1);
+        if (tokens.length > MAX_PART_MATERIALS) {
+            player.sendMessage(miniMessage.deserialize("<red>A part takes at most " + MAX_PART_MATERIALS
+                    + " materials, joined with +: " + arg + "</red>"));
+            return null;
+        }
+
+        List<TinkerMaterial> materials = new ArrayList<>(tokens.length);
+        for (String token : tokens) {
+            TinkerMaterial material = craftMaterial(token);
+            if (material == null) {
+                player.sendMessage(miniMessage.deserialize("<red>Unrecognized material: " + (token.isBlank() ? "(empty)" : token) + "</red>"));
+                return null;
+            }
+            materials.add(material);
+        }
+        return PartComposition.fromMaterials(materials);
+    }
+
+    /** A material id, or a crucible pair id that is forged and registered on demand. */
+    @Nullable
+    private TinkerMaterial craftMaterial(@Nonnull String token) {
+        TinkerMaterial material = parseMaterial(token);
+        if (material != null) return material;
+
+        String clean = token.toLowerCase(Locale.ROOT).trim();
+        if (clean.isEmpty()) return null;
+        TinkerItemRegistry.IdRequest request = TinkerItemRegistry.parseId(
+                clean.startsWith(ID_PREFIX) ? clean : ID_PREFIX + clean);
+        TinkerAlloy alloy = plugin.getAlloyRegistry().alloyForPairId(request.materialId(), materialRegistry);
+        return alloy != null ? materialRegistry.get(alloy.id()) : null;
+    }
+
     private void handleCraftWeapon(Player player, String[] args) {
         ModularWeaponType type;
         try {
@@ -386,38 +448,27 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        TinkerMaterial m1 = parseMaterial(args[3]);
-        TinkerMaterial m2 = parseMaterial(args[4]);
-        if (m1 == null || m2 == null) {
-            player.sendMessage(miniMessage.deserialize("<red>Unrecognized material(s): " + args[3] + " or " + args[4] + "</red>"));
+        if (!type.isTwoPart() && args.length < 6) {
+            player.sendMessage(miniMessage.deserialize("<red>Weapon " + type.name() + " requires 3 materials: <head> <handle> <pommel> [tier]</red>"));
             return;
         }
 
-        TinkerMaterial m3 = null;
-        EvolutionTier tier = EvolutionTier.WOOD;
+        PartComposition c1 = parsePart(player, args[3]);
+        if (c1 == null) return;
+        PartComposition c2 = parsePart(player, args[4]);
+        if (c2 == null) return;
 
+        PartComposition c3 = null;
+        EvolutionTier tier = EvolutionTier.WOOD;
         if (!type.isTwoPart()) {
-            if (args.length < 6) {
-                player.sendMessage(miniMessage.deserialize("<red>Weapon " + type.name() + " requires 3 materials: <head> <handle> <pommel> [tier]</red>"));
-                return;
-            }
-            m3 = parseMaterial(args[5]);
-            if (m3 == null) {
-                player.sendMessage(miniMessage.deserialize("<red>Unrecognized third material: " + args[5] + "</red>"));
-                return;
-            }
+            c3 = parsePart(player, args[5]);
+            if (c3 == null) return;
             if (args.length >= 7) {
                 tier = EvolutionTier.fromString(args[6]);
             }
-        } else {
-            if (args.length >= 6) {
-                tier = EvolutionTier.fromString(args[5]);
-            }
+        } else if (args.length >= 6) {
+            tier = EvolutionTier.fromString(args[5]);
         }
-
-        PartComposition c1 = PartComposition.fromMaterials(List.of(m1));
-        PartComposition c2 = PartComposition.fromMaterials(List.of(m2));
-        PartComposition c3 = (m3 != null) ? PartComposition.fromMaterials(List.of(m3)) : null;
 
         ItemStack weapon = TinkerItemBuilder.createModularWeapon(type, c1, c2, c3, tier, 0);
         player.getInventory().addItem(weapon);
@@ -439,21 +490,12 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        TinkerMaterial m1 = parseMaterial(args[3]);
-        TinkerMaterial m2 = parseMaterial(args[4]);
-        TinkerMaterial m3 = parseMaterial(args[5]);
-        if (m1 == null || m2 == null || m3 == null) {
-            player.sendMessage(miniMessage.deserialize("<red>Unrecognized material(s) in arguments.</red>"));
-            return;
-        }
+        PartComposition[] parts = parseThreeParts(player, args);
+        if (parts == null) return;
 
         EvolutionTier tier = (args.length >= 7) ? EvolutionTier.fromString(args[6]) : EvolutionTier.WOOD;
 
-        PartComposition c1 = PartComposition.fromMaterials(List.of(m1));
-        PartComposition c2 = PartComposition.fromMaterials(List.of(m2));
-        PartComposition c3 = PartComposition.fromMaterials(List.of(m3));
-
-        ItemStack tool = TinkerItemBuilder.createModularTool(type, c1, c2, c3, tier, 0);
+        ItemStack tool = TinkerItemBuilder.createModularTool(type, parts[0], parts[1], parts[2], tier, 0);
         player.getInventory().addItem(tool);
         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.2f);
         player.sendMessage(miniMessage.deserialize("<green>✔ Admin Crafted: </green>").append(tool.getItemMeta().displayName()).append(miniMessage.deserialize("<green>!</green>")));
@@ -473,24 +515,26 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        TinkerMaterial m1 = parseMaterial(args[3]);
-        TinkerMaterial m2 = parseMaterial(args[4]);
-        TinkerMaterial m3 = parseMaterial(args[5]);
-        if (m1 == null || m2 == null || m3 == null) {
-            player.sendMessage(miniMessage.deserialize("<red>Unrecognized material(s) in arguments.</red>"));
-            return;
-        }
+        PartComposition[] parts = parseThreeParts(player, args);
+        if (parts == null) return;
 
         EvolutionTier tier = (args.length >= 7) ? EvolutionTier.fromString(args[6]) : EvolutionTier.WOOD;
 
-        PartComposition c1 = PartComposition.fromMaterials(List.of(m1));
-        PartComposition c2 = PartComposition.fromMaterials(List.of(m2));
-        PartComposition c3 = PartComposition.fromMaterials(List.of(m3));
-
-        ItemStack armor = TinkerItemBuilder.createModularArmor(type, c1, c2, c3, tier, 0);
+        ItemStack armor = TinkerItemBuilder.createModularArmor(type, parts[0], parts[1], parts[2], tier, 0);
         player.getInventory().addItem(armor);
         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.2f);
         player.sendMessage(miniMessage.deserialize("<green>✔ Admin Crafted: </green>").append(armor.getItemMeta().displayName()).append(miniMessage.deserialize("<green>!</green>")));
+    }
+
+    /** The three part slots (arguments 4 to 6) of a tool, an armor piece or a three-part weapon. */
+    @Nullable
+    private PartComposition[] parseThreeParts(@Nonnull Player player, @Nonnull String[] args) {
+        PartComposition[] parts = new PartComposition[3];
+        for (int index = 0; index < parts.length; index++) {
+            parts[index] = parsePart(player, args[3 + index]);
+            if (parts[index] == null) return null;
+        }
+        return parts;
     }
 
     /**
@@ -556,10 +600,10 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
     private void sendHelp(CommandSender sender, String label) {
         sender.sendMessage(miniMessage.deserialize("<gold>=== MultiverseTinker v" + plugin.getPluginMeta().getVersion() + " (Chagui68) ===</gold>"));
         if (AccessControl.allows(sender, AdminCommand.CRAFT)) {
-            sender.sendMessage(miniMessage.deserialize("<yellow>/" + label + " craft <weapon|tool|armor> <type> <m1> <m2> [m3] [tier]</yellow> <gray>- Instant admin crafting without forge.</gray>"));
+            sender.sendMessage(miniMessage.deserialize("<yellow>/" + label + " craft <weapon|tool|armor> <type> <m1> <m2> [m3] [tier]</yellow> <gray>- Instant admin crafting without forge. Each part takes one material or up to three joined with + (a+b+c), and a crucible pair id from the codex is forged on the spot.</gray>"));
         }
         if (AccessControl.allows(sender, AdminCommand.GIVE)) {
-            sender.sendMessage(miniMessage.deserialize("<yellow>/" + label + " give <player> <mvtink_id> [amount]</yellow> <gray>- Give any raw ore, ingot, nugget, block, molten bucket, part, cast, smeltery or brush. The mvtink_ prefix is optional, and a crucible pair id from the codex is forged and registered on the spot.</gray>"));
+            sender.sendMessage(miniMessage.deserialize("<yellow>/" + label + " give <player> <mvtink_id> [amount]</yellow> <gray>- Give any raw ore, ingot, nugget, block, molten bucket, part, cast, smeltery or brush. The mvtink_ prefix is optional, and a crucible pair id from the codex is forged and registered on the spot (a prime over an unsmelted composite forges both).</gray>"));
         }
         if (AccessControl.allows(sender, Surface.CODEX)) {
             sender.sendMessage(miniMessage.deserialize("<yellow>/" + label + " codex [player]</yellow> <gray>- Open the browsable Alloy Codex: the mineral catalog, legendary recipes, catalysts, forged composites and primes, a combination explorer and the totals.</gray>"));
@@ -624,7 +668,7 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
                 return filter(Arrays.stream(EvolutionTier.values()).map(Enum::name).toList(), args[tierSlot - 1]);
             }
             if (args.length >= 4 && args.length < tierSlot) {
-                return filterIds(craftCandidates(), args[args.length - 1]);
+                return completePart(args[args.length - 1]);
             }
         }
 
@@ -693,6 +737,26 @@ public class MultiverseTinkerCommand implements CommandExecutor, TabCompleter {
         }
         Collections.sort(ids);
         return ids;
+    }
+
+    /**
+     * Suggestions for one part slot of {@code /mvtink craft}, which may already hold materials joined
+     * with {@code +}: only the token being typed is completed, and what precedes it is kept as typed.
+     */
+    @Nonnull
+    private List<String> completePart(@Nonnull String typed) {
+        int plus = typed.lastIndexOf('+');
+        if (plus < 0) return filterIds(craftCandidates(), typed);
+
+        String done = typed.substring(0, plus + 1);
+        long joined = done.chars().filter(c -> c == '+').count();
+        if (joined >= MAX_PART_MATERIALS) return Collections.emptyList();
+
+        List<String> result = new ArrayList<>();
+        for (String id : filterIds(craftCandidates(), typed.substring(plus + 1))) {
+            result.add(done + id);
+        }
+        return result;
     }
 
     /** Up to five registered ids that start with (or contain) what the sender typed. */

@@ -213,8 +213,8 @@ the brush and the casts belong to no material at all, any active filter hides th
 |---|---|---|
 | `/mvtink` | everyone | Public help (only `codex`). With `multiversetinker.admin` or any of its per-subcommand nodes: the help for the subcommands that player may run |
 | `/mvtink codex [player]` | codex users; another player needs admin | Opens the Alloy Codex |
-| `/mvtink craft <weapon\|tool\|armor> <type> <m1> <m2> [m3] [tier]` | admin | Forges equipment instantly |
-| `/mvtink give <player> <id> [amount]` | admin | Gives any registered item, forging and registering the alloy when the id names a crucible pair nobody has smelted yet |
+| `/mvtink craft <weapon\|tool\|armor> <type> <m1> <m2> [m3] [tier]` | admin | Forges equipment instantly; each part takes one material or up to three joined with `+` |
+| `/mvtink give <player> <id> [amount]` | admin | Gives any registered item, forging and registering the alloy when the id names a crucible pair nobody has smelted yet (a prime over an unsmelted composite forges both) |
 | `/mvtink forge <build\|check\|gui> [rotation]` | admin | Builds / validates / opens the Forge |
 | `/mvtink verify` | admin | Diagnoses the item registry |
 | `/mvtink reload` | admin | Reloads config, items and loot |
@@ -234,7 +234,11 @@ server decides without installing a permissions plugin. See **[Configuration](Co
 Tab completion offers **every registered item id** in one list and filters it as you type, and the
 `mvtink_` prefix is optional everywhere — typing `tin` finds `mvtink_tin`, `mvtink_tin_ingot` and the
 rest. In `/mvtink craft` the material slots accept those item ids too, so an id copied out of the
-codex can be pasted straight in.
+codex can be pasted straight in. A slot can also **blend up to three materials** joined with `+`
+(`gold+ruby+cobalt` → 33/33/34, `gold+ruby` → 50/50), the same mixes the Forge's part table casts,
+and tab completion keeps what was already typed before the `+`. A crucible **pair id**
+(`alloy_tin_zinc`, `prime_alloy_tin_zinc_bronze`) is forged and registered on the spot, so every
+alloy and every mixed part the Forge can make is reachable without it.
 
 ---
 

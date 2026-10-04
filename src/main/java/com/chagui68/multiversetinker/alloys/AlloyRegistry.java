@@ -333,6 +333,10 @@ public class AlloyRegistry {
      * a server happens to have registered its materials in. A pair whose alloy is a curated recipe resolves
      * to that recipe, and the id it was asked for is not one of its own.</p>
      *
+     * <p>A prime whose second parent is a composite nobody has blended yet is answered too: the codex
+     * previews it, so the composite is forged on the way and the prime right after it — one id, one
+     * command, exactly the two crucible runs a player would need.</p>
+     *
      * @return the alloy, or {@code null} when the id names no craftable pair
      */
     @Nullable
@@ -345,9 +349,25 @@ public class AlloyRegistry {
                 : null;
         if (prefix == null) return null;
 
-        String rest = key.substring(prefix.length());
-        TinkerMaterial first = null;
-        TinkerMaterial second = null;
+        TinkerMaterial[] pair = splitRegisteredPair(key.substring(prefix.length()), materialRegistry);
+        // The prefix has to be the one this pair really produces: a composite id never names a prime,
+        // and a prime id never names a plain composite.
+        if (pair != null && dynamicId(pair[0], pair[1]).equals(key) && isCraftablePair(pair[0], pair[1])) {
+            return findOrCreateAlloy(pair[0], pair[1], materialRegistry);
+        }
+
+        return prefix.equals(PRIME_PREFIX) ? primeOverPendingComposite(key, materialRegistry) : null;
+    }
+
+    /**
+     * Splits the part of a pair id after its prefix into two <b>registered</b> parents.
+     *
+     * <p>Every material that could be the first parent is tried and the longest one wins, so a pair
+     * never resolves differently on another server.</p>
+     */
+    @Nullable
+    private static TinkerMaterial[] splitRegisteredPair(@Nonnull String rest, @Nonnull MaterialRegistry materialRegistry) {
+        TinkerMaterial[] pair = null;
         int firstLength = 0;
 
         for (TinkerMaterial candidate : materialRegistry.getAll()) {
@@ -358,19 +378,56 @@ public class AlloyRegistry {
             TinkerMaterial partner = materialRegistry.get("mvtink_" + rest.substring(bare.length() + 1));
             if (partner == null) continue;
 
-            // Longest first parent wins, so a pair never resolves differently on another server.
-            first = candidate;
-            second = partner;
+            pair = new TinkerMaterial[]{candidate, partner};
             firstLength = bare.length();
         }
+        return pair;
+    }
 
-        if (first == null) return null;
+    /**
+     * A prime pair id that fuses a legendary with a composite which has not been blended yet.
+     *
+     * <p>The whole prime is validated before anything is registered — the legendary, the composite's
+     * own two minerals, and the canonical spelling of both ids — so a refused id still forges nothing.
+     * A pair of minerals that resolves to a curated recipe is no composite: that prime is spelled with
+     * the recipe's own id instead. Cuts are tried left to right and the first valid one wins, which
+     * keeps the answer independent of registration order.</p>
+     */
+    @Nullable
+    private TinkerAlloy primeOverPendingComposite(@Nonnull String key, @Nonnull MaterialRegistry materialRegistry) {
+        String rest = key.substring(PRIME_PREFIX.length());
 
-        // The prefix has to be the one this pair really produces: a composite id never names a prime,
-        // and a prime id never names a plain composite.
-        if (!dynamicId(first, second).equals(key)) return null;
-        if (!isCraftablePair(first, second)) return null;
-        return findOrCreateAlloy(first, second, materialRegistry);
+        for (int cut = rest.indexOf('_'); cut > 0; cut = rest.indexOf('_', cut + 1)) {
+            String left = rest.substring(0, cut);
+            String right = rest.substring(cut + 1);
+
+            for (String[] side : List.of(new String[]{left, right}, new String[]{right, left})) {
+                TinkerMaterial legendary = materialRegistry.get("mvtink_" + side[0]);
+                if (!isLegendary(legendary)) continue;
+
+                String compositeId = "mvtink_" + side[1];
+                if (!compositeId.startsWith(COMPOSITE_PREFIX) || materialRegistry.get(compositeId) != null) continue;
+
+                TinkerMaterial[] minerals = splitRegisteredPair(compositeId.substring(COMPOSITE_PREFIX.length()), materialRegistry);
+                if (minerals == null) continue;
+                if (!isMixable(minerals[0]) || !isMixable(minerals[1])) continue;
+                if (!dynamicId(minerals[0], minerals[1]).equals(compositeId)) continue;
+                if (findAlloy(minerals[0].getId(), minerals[1].getId()) != null) continue;
+
+                // Same canonical order dynamicId applies: the smaller full id is spelled first.
+                String legendaryId = legendary.getId().toLowerCase(Locale.ROOT);
+                String expected = legendaryId.compareTo(compositeId) <= 0
+                        ? PRIME_PREFIX + side[0] + "_" + side[1]
+                        : PRIME_PREFIX + side[1] + "_" + side[0];
+                if (!expected.equals(key)) continue;
+
+                TinkerAlloy composite = findOrCreateAlloy(minerals[0], minerals[1], materialRegistry);
+                TinkerMaterial compositeMaterial = materialRegistry.get(composite.id());
+                if (compositeMaterial == null || !isCraftablePair(legendary, compositeMaterial)) return null;
+                return findOrCreateAlloy(legendary, compositeMaterial, materialRegistry);
+            }
+        }
+        return null;
     }
 
     /** Narrative for a freshly fused prime alloy, naming the catalyst when it has one. */
