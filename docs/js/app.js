@@ -251,7 +251,7 @@ function render() {
   text('footerTitle', t('footerTitle'));
   text('footerNote', t('footerNote'));
 
-  const repo = 'https://github.com/DrakesCraft-Labs/MultiverseTinker/blob/main';
+  const repo = 'https://github.com/SlimefunNewHorizons/MultiverseTinker/blob/main';
   const wiki = state.lang === 'es' ? 'Wiki-es' : 'Wiki-en';
   mount('footerLinks',
     el('li', {}, el('a', { href: `${repo}/${wiki}`, text: t('footerWiki') })),

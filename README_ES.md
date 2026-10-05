@@ -7,13 +7,13 @@
 <p>
   <img src="https://img.shields.io/badge/Paper-1.21.11_·_26.1_·_26.2-38BDF8?style=for-the-badge&logo=minecraft&logoColor=white" alt="Paper 1.21.11 · 26.1 · 26.2"/>
   <img src="https://img.shields.io/badge/Java-21+-F89820?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21+"/>
-  <a href="https://github.com/DrakesCraft-Labs/MultiverseTinker/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/DrakesCraft-Labs/MultiverseTinker/tests.yml?branch=main&style=for-the-badge&label=Tests" alt="Tests"/></a>
+  <a href="https://github.com/SlimefunNewHorizons/MultiverseTinker/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/SlimefunNewHorizons/MultiverseTinker/tests.yml?branch=main&style=for-the-badge&label=Tests" alt="Tests"/></a>
   <img src="https://img.shields.io/badge/Licencia-GPLv3-blue?style=for-the-badge" alt="GPLv3"/>
   <img src="https://img.shields.io/badge/Autor-Chagui68-22C55E?style=for-the-badge" alt="Chagui68"/>
   <img src="https://img.shields.io/badge/Minerales-90_Total-purple?style=for-the-badge" alt="90 Minerales"/>
 </p>
 
-Parte del **Ecosistema Soberano Multiverse de Chagui68** junto a [MultiverseNets](https://github.com/DrakesCraft-Labs/MultiverseNets), [MultiverseCreatures](https://github.com/DrakesCraft-Labs/MultiverseCreatures) y [MultiverseProgramming](https://github.com/DrakesCraft-Labs/MultiverseProgramming).
+Parte del **Ecosistema Soberano Multiverse de Chagui68** junto a [MultiverseNets](https://github.com/SlimefunNewHorizons/MultiverseNets), [MultiverseCreatures](https://github.com/SlimefunNewHorizons/MultiverseCreatures) y [MultiverseProgramming](https://github.com/SlimefunNewHorizons/MultiverseProgramming).
 
 [📖 Wiki en Español](Wiki-es/Home.md) · [🗺️ Resumen de Mecánicas](Wiki-es/Resumen-de-Mecanicas.md) · [🧩 Referencia de Materiales](Wiki-es/Fuentes-de-Materiales.md) · [🧪 Índice de Recetas](Wiki-es/Indice-de-Recetas.md) · [🏛️ Estructura Forja](Wiki-es/Estructura-Forja.md) · [⚡ Rasgos de Forja](Wiki-es/Rasgos-y-Efectos.md) · [📖 English Wiki](Wiki-en/Home.md) · [🏛️ Forge Multiblock](Wiki-en/Forge-Structure.md) · [⚡ Forge Traits](Wiki-en/Traits-and-Effects.md) · [English (README)](README.md)
 

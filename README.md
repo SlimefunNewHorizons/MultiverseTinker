@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/DrakesCraft-Labs/MultiverseTinker/main/banner.svg" width="100%" alt="MultiverseTinker — animated forge banner" />
+<img src="https://raw.githubusercontent.com/SlimefunNewHorizons/MultiverseTinker/main/banner.svg" width="100%" alt="MultiverseTinker — animated forge banner" />
 
 # ⚒️ MultiverseTinker
 
@@ -9,13 +9,13 @@
 <p>
   <img src="https://img.shields.io/badge/Paper-1.21.11_·_26.1_·_26.2-38BDF8?style=for-the-badge&logo=minecraft&logoColor=white" alt="Paper 1.21.11 · 26.1 · 26.2"/>
   <img src="https://img.shields.io/badge/Java-21+-F89820?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21+"/>
-  <a href="https://github.com/DrakesCraft-Labs/MultiverseTinker/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/DrakesCraft-Labs/MultiverseTinker/tests.yml?branch=main&style=for-the-badge&label=Tests" alt="Tests"/></a>
+  <a href="https://github.com/SlimefunNewHorizons/MultiverseTinker/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/SlimefunNewHorizons/MultiverseTinker/tests.yml?branch=main&style=for-the-badge&label=Tests" alt="Tests"/></a>
   <img src="https://img.shields.io/badge/License-GPLv3-blue?style=for-the-badge" alt="GPLv3"/>
   <img src="https://img.shields.io/badge/Author-Chagui68-22C55E?style=for-the-badge" alt="Chagui68"/>
   <img src="https://img.shields.io/badge/Minerals-90_Total-purple?style=for-the-badge" alt="90 Minerals"/>
 </p>
 
-Part of **Chagui68's Sovereign Multiverse Suite** alongside [MultiverseNets](https://github.com/DrakesCraft-Labs/MultiverseNets), [MultiverseCreatures](https://github.com/DrakesCraft-Labs/MultiverseCreatures), and [MultiverseProgramming](https://github.com/DrakesCraft-Labs/MultiverseProgramming).
+Part of **Chagui68's Sovereign Multiverse Suite** alongside [MultiverseNets](https://github.com/SlimefunNewHorizons/MultiverseNets), [MultiverseCreatures](https://github.com/SlimefunNewHorizons/MultiverseCreatures), and [MultiverseProgramming](https://github.com/SlimefunNewHorizons/MultiverseProgramming).
 
 [📖 English Wiki](Wiki-en/Home.md) · [🗺️ Mechanics Overview](Wiki-en/Mechanics-Overview.md) · [🧩 Material Reference](Wiki-en/Material-Reference.md) · [🧪 Alloy Recipe Index](Wiki-en/Alloy-Recipe-Index.md) · [🏛️ Forge Multiblock](Wiki-en/Forge-Structure.md) · [⚡ Forge Traits](Wiki-en/Traits-and-Effects.md) · [🔮 Trait Affinities](Wiki-en/Trait-Affinities.md) · [📖 Wiki en Español](Wiki-es/Home.md) · [🗺️ Resumen de Mecánicas](Wiki-es/Resumen-de-Mecanicas.md) · [🧩 Referencia de Materiales](Wiki-es/Fuentes-de-Materiales.md) · [🧪 Índice de Recetas](Wiki-es/Indice-de-Recetas.md) · [🏛️ Estructura Forja](Wiki-es/Estructura-Forja.md) · [⚡ Rasgos de Forja](Wiki-es/Rasgos-y-Efectos.md) · [🔮 Afinidades](Wiki-es/Afinidades-de-Rasgos.md) · [Español (README)](README_ES.md)
 
@@ -370,6 +370,6 @@ License: **GPL-3.0**
 
 ## 📄 License & Sovereign Authorship
 
-Copyright © 2026 [**Chagui68**](https://github.com/Chagui68) · [**DrakesCraft Labs**](https://github.com/DrakesCraft-Labs).
+Copyright © 2026 [**Chagui68**](https://github.com/Chagui68) · [**DrakesCraft Labs**](https://github.com/SlimefunNewHorizons).
 
 This project is an **original sovereign creation** engineered by **Chagui68** for the DrakesCraft network. All intellectual authorship belongs to Chagui68. Commercial resale, repackaging in paid setups, or removing creator attribution is strictly prohibited.

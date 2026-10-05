@@ -30,7 +30,7 @@ Welcome to the official **MultiverseTinker** wiki! MultiverseTinker is a soverei
 ## 🌟 Sovereign Multiverse Ecosystem
 
 MultiverseTinker forms part of the high-performance standalone plugin suite maintained by **DrakesCraft Labs**:
-1. **[MultiverseTinker](https://github.com/DrakesCraft-Labs/MultiverseTinker)**: Modular metallurgy, geology, and molten metal casting.
-2. **[MultiverseNets](https://github.com/DrakesCraft-Labs/MultiverseNets)**: Standalone item transport networks, digital logistics, and quantum storage.
-3. **[MultiverseCreatures](https://github.com/DrakesCraft-Labs/MultiverseCreatures)**: Adaptive mythic bosses, relics, and multiverse mobs.
-4. **[MultiverseProgramming](https://github.com/DrakesCraft-Labs/MultiverseProgramming)**: Autonomous robotic turtles, Lua computers, and Blueprint web dispatching.
+1. **[MultiverseTinker](https://github.com/SlimefunNewHorizons/MultiverseTinker)**: Modular metallurgy, geology, and molten metal casting.
+2. **[MultiverseNets](https://github.com/SlimefunNewHorizons/MultiverseNets)**: Standalone item transport networks, digital logistics, and quantum storage.
+3. **[MultiverseCreatures](https://github.com/SlimefunNewHorizons/MultiverseCreatures)**: Adaptive mythic bosses, relics, and multiverse mobs.
+4. **[MultiverseProgramming](https://github.com/SlimefunNewHorizons/MultiverseProgramming)**: Autonomous robotic turtles, Lua computers, and Blueprint web dispatching.

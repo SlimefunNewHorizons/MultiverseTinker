@@ -30,7 +30,7 @@
 ## 🌟 Ecosistema Multiverse de Chagui68
 
 MultiverseTinker forma parte de la suite de plugins de alto rendimiento mantenida por **DrakesCraft Labs**:
-1. **[MultiverseTinker](https://github.com/DrakesCraft-Labs/MultiverseTinker)**: Metalurgia modular, arqueología y templado de metales fundidos.
-2. **[MultiverseNets](https://github.com/DrakesCraft-Labs/MultiverseNets)**: Redes logísticas digitales, transporte de ítems y almacenamiento cuántico.
-3. **[MultiverseCreatures](https://github.com/DrakesCraft-Labs/MultiverseCreatures)**: Jefes adaptativos míticos, reliquias y monstruos multiversales.
-4. **[MultiverseProgramming](https://github.com/DrakesCraft-Labs/MultiverseProgramming)**: Tortugas robóticas autónomas, computadoras en Lua y despacho de planos vía web.
+1. **[MultiverseTinker](https://github.com/SlimefunNewHorizons/MultiverseTinker)**: Metalurgia modular, arqueología y templado de metales fundidos.
+2. **[MultiverseNets](https://github.com/SlimefunNewHorizons/MultiverseNets)**: Redes logísticas digitales, transporte de ítems y almacenamiento cuántico.
+3. **[MultiverseCreatures](https://github.com/SlimefunNewHorizons/MultiverseCreatures)**: Jefes adaptativos míticos, reliquias y monstruos multiversales.
+4. **[MultiverseProgramming](https://github.com/SlimefunNewHorizons/MultiverseProgramming)**: Tortugas robóticas autónomas, computadoras en Lua y despacho de planos vía web.
