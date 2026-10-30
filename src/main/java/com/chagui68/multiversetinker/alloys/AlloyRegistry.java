@@ -788,7 +788,7 @@ public class AlloyRegistry {
                     .type(MaterialType.ALLOY)
                     .baseVanillaMaterial(catalyst.getItem())
                     .processedVanillaMaterial(catalyst.getItem())
-                    .nuggetVanillaMaterial(catalyst.getItem())
+                    .nuggetVanillaMaterial(catalyst.getItem().getMaxStackSize() >= 9 ? catalyst.getItem() : org.bukkit.Material.GOLD_NUGGET)
                     .blockVanillaMaterial(catalyst.getItem())
                     .colorHex(catalyst.getColorHex())
                     .description(catalyst.getLoreLine())
