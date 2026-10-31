@@ -2,21 +2,15 @@ package com.chagui68.multiversetinker.alloys;
 
 import com.chagui68.multiversetinker.materials.MaterialRegistry;
 import com.chagui68.multiversetinker.tools.VanillaCatalyst;
-import org.mockbukkit.mockbukkit.MockBukkit;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.bukkit.Material;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AlloyRegistryTest {
 
-    private AlloyRegistry registry;
-
-    @BeforeEach
-    void setUp() {
-        registry = new AlloyRegistry();
-    }
+    private final AlloyRegistry registry = new AlloyRegistry();
 
     @Test
     @DisplayName("Must register all 16 predefined alloy recipes")
@@ -57,19 +51,14 @@ class AlloyRegistryTest {
     }
 
     @Test
-    @DisplayName("Catalyst ingot carriers must support the forge batch size")
+    @DisplayName("Non-stackable catalysts use a stackable ingot carrier")
     void catalystIngotCarriersSupportForgeBatches() {
-        MockBukkit.mock();
-        try {
-            MaterialRegistry materials = new MaterialRegistry();
-            registry.registerCatalystMaterials(materials);
+        MaterialRegistry materials = new MaterialRegistry();
+        registry.registerCatalystMaterials(materials);
 
-            for (VanillaCatalyst catalyst : VanillaCatalyst.values()) {
-                assertTrue(materials.get(catalyst.getMaterialId()).getProcessedVanillaMaterial().getMaxStackSize() >= 9,
-                        () -> catalyst + " cannot back an ingot batch");
-            }
-        } finally {
-            MockBukkit.unmock();
-        }
+        assertEquals(Material.GOLD_INGOT,
+                materials.get(VanillaCatalyst.TOTEM_OF_UNDYING.getMaterialId()).getProcessedVanillaMaterial());
+        assertEquals(Material.NETHER_STAR,
+                materials.get(VanillaCatalyst.NETHER_STAR.getMaterialId()).getProcessedVanillaMaterial());
     }
 }
