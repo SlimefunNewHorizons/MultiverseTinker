@@ -787,6 +787,8 @@ public class AlloyRegistry {
                     .rarity(MaterialRarity.LEGENDARY)
                     .type(MaterialType.ALLOY)
                     .baseVanillaMaterial(catalyst.getItem())
+                    // The forge outputs ingots in batches. Never use a catalyst that cannot hold
+                    // that batch (for example TOTEM_OF_UNDYING) as its visual carrier.
                     .processedVanillaMaterial(catalyst.getItem().getMaxStackSize() >= 9 ? catalyst.getItem() : org.bukkit.Material.GOLD_INGOT)
                     .nuggetVanillaMaterial(catalyst.getItem().getMaxStackSize() >= 9 ? catalyst.getItem() : org.bukkit.Material.GOLD_NUGGET)
                     .blockVanillaMaterial(catalyst.getItem().getMaxStackSize() >= 9 ? catalyst.getItem() : org.bukkit.Material.GOLD_BLOCK)

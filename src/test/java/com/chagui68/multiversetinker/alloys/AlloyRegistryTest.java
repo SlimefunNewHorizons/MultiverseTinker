@@ -1,5 +1,8 @@
 package com.chagui68.multiversetinker.alloys;
 
+import com.chagui68.multiversetinker.materials.MaterialRegistry;
+import com.chagui68.multiversetinker.tools.VanillaCatalyst;
+import org.mockbukkit.mockbukkit.MockBukkit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +53,23 @@ class AlloyRegistryTest {
             assertTrue(alloy.durabilityBonus() > 0);
             assertTrue(alloy.miningSpeed() > 0);
             assertTrue(alloy.attackDamageBonus() > 0);
+        }
+    }
+
+    @Test
+    @DisplayName("Catalyst ingot carriers must support the forge batch size")
+    void catalystIngotCarriersSupportForgeBatches() {
+        MockBukkit.mock();
+        try {
+            MaterialRegistry materials = new MaterialRegistry();
+            registry.registerCatalystMaterials(materials);
+
+            for (VanillaCatalyst catalyst : VanillaCatalyst.values()) {
+                assertTrue(materials.get(catalyst.getMaterialId()).getProcessedVanillaMaterial().getMaxStackSize() >= 9,
+                        () -> catalyst + " cannot back an ingot batch");
+            }
+        } finally {
+            MockBukkit.unmock();
         }
     }
 }
