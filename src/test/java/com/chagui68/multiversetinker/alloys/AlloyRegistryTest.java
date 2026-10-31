@@ -58,6 +58,10 @@ class AlloyRegistryTest {
 
         assertEquals(Material.GOLD_INGOT,
                 materials.get(VanillaCatalyst.TOTEM_OF_UNDYING.getMaterialId()).getProcessedVanillaMaterial());
+        assertEquals(Material.GOLD_NUGGET,
+                materials.get(VanillaCatalyst.TOTEM_OF_UNDYING.getMaterialId()).getNuggetVanillaMaterial());
+        assertEquals(Material.GOLD_BLOCK,
+                materials.get(VanillaCatalyst.TOTEM_OF_UNDYING.getMaterialId()).getBlockVanillaMaterial());
         assertEquals(Material.NETHER_STAR,
                 materials.get(VanillaCatalyst.NETHER_STAR.getMaterialId()).getProcessedVanillaMaterial());
     }
