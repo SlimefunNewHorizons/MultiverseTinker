@@ -457,7 +457,7 @@ public class MultiverseTinker extends JavaPlugin {
             ItemStack ingot = itemRegistry.getIngotItem(matId);
             ItemStack block = itemRegistry.getBlockItem(matId);
 
-            if (nugget != null && ingot != null) {
+            if (nugget != null && ingot != null && nugget.getType().getMaxStackSize() >= 9) {
                 // 9 Nuggets -> 1 Ingot
                 NamespacedKey nToIKey = new NamespacedKey(this, matId + "_nuggets_to_ingot");
                 ShapedRecipe nToIRecipe = new ShapedRecipe(nToIKey, ingot);
@@ -474,7 +474,7 @@ public class MultiverseTinker extends JavaPlugin {
                 getServer().addRecipe(iToNRecipe);
             }
 
-            if (ingot != null && block != null) {
+            if (ingot != null && block != null && ingot.getType().getMaxStackSize() >= 9) {
                 // 9 Ingots -> 1 Block
                 NamespacedKey iToBKey = new NamespacedKey(this, matId + "_ingots_to_block");
                 ShapedRecipe iToBRecipe = new ShapedRecipe(iToBKey, block);
