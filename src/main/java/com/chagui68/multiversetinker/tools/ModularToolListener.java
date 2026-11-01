@@ -1845,7 +1845,11 @@ public class ModularToolListener implements Listener {
         UUID id = event.getPlayer().getUniqueId();
         primeStateCooldowns.remove(id);
         fellingGuard.remove(id);
-        PerkAnimationEngine.clearPlayer(id);
+        try {
+            PerkAnimationEngine.clearPlayer(id);
+        } catch (Throwable ignored) {
+            // Defensive guard against class loader desynchronization during reload/hot-swapping
+        }
     }
 
     @Nonnull
