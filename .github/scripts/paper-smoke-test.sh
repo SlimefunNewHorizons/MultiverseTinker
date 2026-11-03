@@ -14,7 +14,7 @@ VERSION="${1:?minecraft version required}"
 PLUGIN_JAR="$(realpath "${2:?plugin jar required}")"
 LOG_DIR="$(realpath -m "${SMOKE_LOG_DIR:-smoke-logs}")"
 BOOT_TIMEOUT="${SMOKE_BOOT_TIMEOUT:-420}"
-UA="MultiverseTinker-CI (https://github.com/${GITHUB_REPOSITORY:-DrakesCraft-Labs/MultiverseTinker})"
+UA="MultiverseTinker-CI (https://github.com/${GITHUB_REPOSITORY:-SlimefunNewHorizons/MultiverseTinker})"
 
 WORK="$(mktemp -d)"
 LOG="$WORK/server.log"
